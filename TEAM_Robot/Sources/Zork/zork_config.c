@@ -4,9 +4,11 @@
   *      Author: Erich Styger
  */
 
+#include "stdio.h"
 #include "zork_config.h"
 #include "CLS1.h"
 #include "UTIL1.h"
+
 #if USE_FATFS
   #include "FAT1.h"
 #endif
@@ -197,6 +199,10 @@ void zork_config(void) {
 
 void _exit(int i) { /* own exit routine */
   CLS1_SendStr("exit Zork program\r\n", CLS1_GetStdio()->stdErr);
-  vTaskDelete(ZorkTask);
+  extern FILE *dbfile;
+  if(dbfile!=NULL){
+	  fclose(dbfile); /* close the data file if it was open*/
+  }
+  quitZorkTask();
   for(;;) {}
 }

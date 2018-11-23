@@ -5,7 +5,6 @@
  *
  * This provides the main application entry point.
  */
-
 #include "Platform.h"
 #include "Application.h"
 #include "Event.h"
@@ -199,6 +198,7 @@ static void APP_AdoptToHardware(void) {
 void APP_Start(void) {
 	//Init
 	PL_Init();
+	initZork();
 	APP_AdoptToHardware();
 	EVNT_SetEvent(EVNT_STARTUP);
 
@@ -230,16 +230,36 @@ static void MainLoop(void) {
 	}
 }
 
-static void ZorkTask(void) {
-	zork_config();
-	run_zork_game();
+TaskHandle_t ZorkHandler;
+
+void initZork(void){
+	if(xTaskCreate(ZorkTask, "zork", 1000/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, &ZorkHandler)!= pdPASS){
+				      		for(;;){} //error case
+				}
+	vTaskSuspend(ZorkHandler);
 }
 
 
-TaskHandle_t ZorkHandler;
+static void ZorkTask(void) {
+	for(;;){
+	zork_config();
+	run_zork_game();
+	}
+}
+
+
+
+void quitZorkTask(void){
+	if(xTaskCreate(ZorkTask, "zork", 1000/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, &ZorkHandler)!= pdPASS){
+					      		for(;;){} //error case
+					}
+	//vTaskResume(ShellHandler);
+	vTaskSuspend(ZorkHandler);
+	vTaskDelete(NULL);
+}
+
 
 void startZorkTask(void){
-	if(xTaskCreate(ZorkTask, "zork", 800/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, NULL)!= pdPASS){
-	      		for(;;){} //error case
-	      	}
+	vTaskResume(ZorkHandler);
+	vTaskSuspend(NULL);
 }

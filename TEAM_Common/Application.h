@@ -18,8 +18,14 @@ void APP_EventHandler(EVNT_Handle event);
 #endif
 
 void APP_Start(void);
+
 static void MainLoop(void);
 static void BlinkyTask(void);
+
+void initZork(void);
+void quitZorkTask(void);
+void startZorkTask(void);
 static void ZorkTask(void);
 
 #endif /* SOURCES_FS2016_COMMON_APPLICATION_H_ */
+
