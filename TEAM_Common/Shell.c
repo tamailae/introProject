@@ -348,7 +348,7 @@ static uint8_t SHELL_ParseCommand(const unsigned char *cmd, bool *handled, const
   } else if (UTIL1_strcmp((char*)cmd, CLS1_CMD_STATUS)==0 || UTIL1_strcmp((char*)cmd, "zork")==0) {
       *handled = TRUE;
       startZorkTask();
-      return;
+      return ERR_OK;
     }
   	else if (UTIL1_strncmp(cmd, "Shell val ", sizeof("Shell val ")-1)==0) {
     p = cmd+sizeof("Shell val ")-1;
@@ -409,14 +409,20 @@ static void ShellTask(void *pvParameters) {
 }
 #endif /* PL_CONFIG_HAS_RTOS */
 
+TaskHandle_t ShellHandler;
+
 void SHELL_Init(void) {
   SHELL_val = 0;
   CLS1_SetStdio(SHELL_GetStdio()); /* set default standard I/O to RTT */
 #if PL_CONFIG_HAS_RTOS
-  if (xTaskCreate(ShellTask, "Shell", 900/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, NULL) != pdPASS) {
+  if (xTaskCreate(ShellTask, "Shell", 900/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, &ShellHandler) != pdPASS) {
     for(;;){} /* error */
   }
 #endif
+}
+
+TaskHandle_t GetShellHandle(void){
+	return ShellHandler;
 }
 
 void SHELL_Deinit(void) {

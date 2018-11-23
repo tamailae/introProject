@@ -241,6 +241,7 @@ void initZork(void){
 
 
 static void ZorkTask(void) {
+	vTaskSuspend(NULL);
 	for(;;){
 	zork_config();
 	run_zork_game();
@@ -253,8 +254,7 @@ void quitZorkTask(void){
 	if(xTaskCreate(ZorkTask, "zork", 1000/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, &ZorkHandler)!= pdPASS){
 					      		for(;;){} //error case
 					}
-	//vTaskResume(ShellHandler);
-	vTaskSuspend(ZorkHandler);
+	vTaskResume(GetShellHandle());
 	vTaskDelete(NULL);
 }
 

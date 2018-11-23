@@ -10,9 +10,11 @@
 #define SHELL_H_
 
 #include "Platform.h"
+//#include "task.h"
 #if PL_CONFIG_HAS_SHELL
 
 #include "CLS1.h"
+#include "FRTOS1.h"
 
 /*!
  * \brief Returns the current standard I/O handler
@@ -31,6 +33,13 @@ void SHELL_ParseCmd(uint8_t *cmd);
  * \param msg Zero terminated string to write
  */
 void SHELL_SendString(unsigned char *msg);
+
+
+/*!
+ * \brief Sends the ShellHandle
+ * \return TaskHandle_t ShellHandle
+ */
+TaskHandle_t GetShellHandle(void);
 
 /*! \brief Shell Module initialization, creates Shell task */
 void SHELL_Init(void);
