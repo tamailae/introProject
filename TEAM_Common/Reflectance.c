@@ -40,6 +40,7 @@
   static xSemaphoreHandle REF_StartStopSem = NULL;
 #endif
 
+
 typedef enum {
   REF_STATE_INIT,
   REF_STATE_NOT_CALIBRATED,
@@ -139,24 +140,29 @@ void REF_CalibrateStartStop(void) {
 static void REF_MeasureRaw(SensorTimeType raw[REF_NOF_SENSORS]) {
   uint8_t cnt; /* number of sensor */
   uint8_t i;
+#define REF_TIMEOUT_TICKS 0xBB80	// Wait 800us
   RefCnt_TValueType timerVal;
   /*! \todo Consider reentrancy and mutual exclusion! */
 
   LED_IR_On(); /* IR LED's on */
   WAIT1_Waitus(200);
-  taskENTER_CRITICAL();
   for(i=0;i<REF_NOF_SENSORS;i++) {
     SensorFctArray[i].SetOutput(); /* turn I/O line as output */
     SensorFctArray[i].SetVal(); /* put high */
     raw[i] = MAX_SENSOR_VALUE;
   }
   WAIT1_Waitus(50); /* give at least 10 us to charge the capacitor */
+  taskENTER_CRITICAL();
   for(i=0;i<REF_NOF_SENSORS;i++) {
     SensorFctArray[i].SetInput(); /* turn I/O line as input */
   }
   (void)RefCnt_ResetCounter(timerHandle); /* reset timer counter */
   do {
     timerVal = RefCnt_GetCounterValue(timerHandle);
+    if(timerVal>REF_TIMEOUT_TICKS){
+    	// is timeout=TRUE
+    	break;
+    }
     cnt = 0;
     for(i=0;i<REF_NOF_SENSORS;i++) {
       if (raw[i]==MAX_SENSOR_VALUE) { /* not measured yet? */
@@ -516,6 +522,8 @@ static void REF_StateMachine(void) {
     case REF_STATE_NOT_CALIBRATED:
       REF_MeasureRaw(SensorRaw);
       /*! \todo You might add a new event to your event module...*/
+
+
 #if REF_START_STOP_CALIB
       if (xSemaphoreTake(REF_StartStopSem, 0)==pdTRUE) {
         refState = REF_STATE_START_CALIBRATION;
@@ -596,7 +604,7 @@ void REF_Init(void) {
   refState = REF_STATE_INIT;
   timerHandle = RefCnt_Init(NULL);
   /*! \todo You might need to adjust priority or other task settings */
-  if (xTaskCreate(ReflTask, "Refl", 600/sizeof(StackType_t), NULL, tskIDLE_PRIORITY, NULL) != pdPASS) {
+  if (xTaskCreate(ReflTask, "Refl", 600/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+2, NULL) != pdPASS) {
     for(;;){} /* error */
   }
 }

@@ -170,6 +170,9 @@ void PL_Init(void) {
 #if PL_CONFIG_HAS_SUMO
   SUMO_Init();
 #endif
+#if PL_CONFIG_HAS_ZORK
+  initZork();
+#endif
 }
 
 void PL_Deinit(void) {

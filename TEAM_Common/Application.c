@@ -97,13 +97,13 @@ void APP_EventHandler(EVNT_Handle event) {
 #if PL_CONFIG_NOF_KEYS>=1
 	case EVNT_SW1_PRESSED:
 		LED1_Neg();
-        //CLS1_SendStr("SW1 short pressed\n", CLS1_GetStdio()->stdOut);
+		//CLS1_SendStr("SW1 short pressed\n", CLS1_GetStdio()->stdOut);
 		BtnMsg(1, "short pressed");
 		//BUZ_PlayTune(BUZ_TUNE_BUTTON);
 		break;
 	case EVNT_SW1_LPRESSED:
 		LED1_Neg();
-        //CLS1_SendStr("SW1 long pressed\n", CLS1_GetStdio()->stdOut);
+		//CLS1_SendStr("SW1 long pressed\n", CLS1_GetStdio()->stdOut);
 		BtnMsg(1, "long pressed");
 		//BUZ_PlayTune(BUZ_TUNE_BUTTON_LONG);
 		break;
@@ -198,16 +198,19 @@ static void APP_AdoptToHardware(void) {
 void APP_Start(void) {
 	//Init
 	PL_Init();
-	initZork();
 	APP_AdoptToHardware();
 	EVNT_SetEvent(EVNT_STARTUP);
 
 	// Tasks
-	if(xTaskCreate(MainLoop, "main",  500/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, NULL)!= pdPASS){
-		for(;;){} //error case
+	if (xTaskCreate(MainLoop, "main", 500 / sizeof(StackType_t), NULL,
+			tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+		for (;;) {
+		} //error case
 	}
-	if(xTaskCreate(BlinkyTask, "blink", 500/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, NULL)!= pdPASS){
-		for(;;){} //error case
+	if (xTaskCreate(BlinkyTask, "blink", 500 / sizeof(StackType_t), NULL,
+			tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+		for (;;) {
+		} //error case
 	}
 	// Start Scheduler
 	vTaskStartScheduler();
@@ -232,34 +235,34 @@ static void MainLoop(void) {
 
 TaskHandle_t ZorkHandler;
 
-void initZork(void){
-	if(xTaskCreate(ZorkTask, "zork", 1000/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, &ZorkHandler)!= pdPASS){
-				      		for(;;){} //error case
-				}
+void initZork(void) {
+	if (xTaskCreate(ZorkTask, "zork", 1000 / sizeof(StackType_t), NULL,
+			tskIDLE_PRIORITY + 1, &ZorkHandler) != pdPASS) {
+		for (;;) {
+		} //error case
+	}
 	vTaskSuspend(ZorkHandler);
 }
 
-
 static void ZorkTask(void) {
 	vTaskSuspend(NULL);
-	for(;;){
-	zork_config();
-	run_zork_game();
+	for (;;) {
+		zork_config();
+		run_zork_game();
 	}
 }
 
-
-
-void quitZorkTask(void){
-	if(xTaskCreate(ZorkTask, "zork", 1000/sizeof(StackType_t), NULL, tskIDLE_PRIORITY+1, &ZorkHandler)!= pdPASS){
-					      		for(;;){} //error case
-					}
+void quitZorkTask(void) {
+	if (xTaskCreate(ZorkTask, "zork", 1000 / sizeof(StackType_t), NULL,
+			tskIDLE_PRIORITY + 1, &ZorkHandler) != pdPASS) {
+		for (;;) {
+		} //error case
+	}
 	vTaskResume(GetShellHandle());
 	vTaskDelete(NULL);
 }
 
-
-void startZorkTask(void){
+void startZorkTask(void) {
 	vTaskResume(ZorkHandler);
 	vTaskSuspend(NULL);
 }
