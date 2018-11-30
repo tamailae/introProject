@@ -37,6 +37,7 @@ extern "C" {
 #include "Timer.h"
 #include "Keys.h"
 #include "Trigger.h"
+#include "Tacho.h"
 /*
  *
  ** ===================================================================
@@ -71,6 +72,8 @@ void Cpu_OnNMIINT(void) {
  */
 void QuadInt_OnInterrupt(void) {
 	/* Write your code here ... */
+	Q4CLeft_Sample();
+	Q4CRight_Sample();
 }
 
 /*
@@ -135,6 +138,7 @@ void FRTOS1_vApplicationTickHook(void) {
 	/* Called for every RTOS tick. */
 	/* Write your code here ... */
 	TRG_AddTick();
+	//TACHO_Sample(); //Ist jetzt im 5ms SW Timer drin
 
 }
 
