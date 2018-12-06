@@ -380,7 +380,7 @@ static uint8_t ParsePidParameter(PID_Config *config, const unsigned char *cmd, b
   }
   return res;
 }
-
+#if PL_CONFIG_HAS_CONFIG_NVM
 static uint8_t PID_LoadSettingsFromFlash(void) {
   PIDConfig_t *ptr;
 
@@ -395,6 +395,7 @@ static uint8_t PID_LoadSettingsFromFlash(void) {
 static uint8_t PID_StoreSettingsToFlash(void) {
   return NVMC_SavePIDData(&config, sizeof(config));
 }
+#endif
 
 uint8_t PID_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io) {
   uint8_t res = ERR_OK;
@@ -428,8 +429,8 @@ uint8_t PID_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_Std
     if (res!=ERR_OK) {
       CLS1_SendStr((unsigned char*)"Loading from FLASH failed!\r\n", io->stdErr);
     }
-  }
 #endif
+  }
   return res;
 }
 #endif /* PL_HAS_SHELL */
@@ -492,7 +493,6 @@ void PID_Init(void) {
   config.posRightConfig.lastError = config.posLeftConfig.lastError;
   config.posRightConfig.integral = config.posLeftConfig.integral;
   config.posRightConfig.maxSpeedPercent = config.posLeftConfig.maxSpeedPercent;
-
 }
 
 #endif /* PL_CONFIG_HAS_PID */
