@@ -96,16 +96,29 @@ void APP_EventHandler(EVNT_Handle event) {
 		break;
 #if PL_CONFIG_NOF_KEYS>=1
 	case EVNT_SW1_PRESSED:
-		LED1_Neg();
+		//LED1_Neg();
+		BUZ_PlayTune(BUZ_TUNE_BUTTON);
 		//CLS1_SendStr("SW1 short pressed\n", CLS1_GetStdio()->stdOut);
 		BtnMsg(1, "short pressed");
-		//BUZ_PlayTune(BUZ_TUNE_BUTTON);
+#if PL_CONFIG_HAS_LINE_FOLLOW
+		if(!REF_IsReady()){
+			REF_CalibrateStartStop();
+			break;
+		}
+		if(LF_IsFollowing()){
+			LF_StartStopFollowing();
+		}
+		else{
+			WAIT1_Waitms(100);
+			LF_StartFollowing();
+		}
+#endif
 		break;
 	case EVNT_SW1_LPRESSED:
-		LED1_Neg();
+		//LED1_Neg();
 		//CLS1_SendStr("SW1 long pressed\n", CLS1_GetStdio()->stdOut);
 		BtnMsg(1, "long pressed");
-		//BUZ_PlayTune(BUZ_TUNE_BUTTON_LONG);
+		BUZ_PlayTune(BUZ_TUNE_BUTTON_LONG);
 		break;
 	case EVNT_SW1_RELEASED:
 		//CLS1_SendStr("SW1 released\n", CLS1_GetStdio()->stdOut);
