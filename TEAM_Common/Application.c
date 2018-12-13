@@ -97,7 +97,7 @@ void APP_EventHandler(EVNT_Handle event) {
 #if PL_CONFIG_NOF_KEYS>=1
 	case EVNT_SW1_PRESSED:
 		//LED1_Neg();
-		BUZ_PlayTune(BUZ_TUNE_BUTTON);
+		//BUZ_PlayTune(BUZ_TUNE_BUTTON);
 		//CLS1_SendStr("SW1 short pressed\n", CLS1_GetStdio()->stdOut);
 		BtnMsg(1, "short pressed");
 #if PL_CONFIG_HAS_LINE_FOLLOW
@@ -118,7 +118,7 @@ void APP_EventHandler(EVNT_Handle event) {
 		//LED1_Neg();
 		//CLS1_SendStr("SW1 long pressed\n", CLS1_GetStdio()->stdOut);
 		BtnMsg(1, "long pressed");
-		BUZ_PlayTune(BUZ_TUNE_BUTTON_LONG);
+		//BUZ_PlayTune(BUZ_TUNE_BUTTON_LONG);
 		break;
 	case EVNT_SW1_RELEASED:
 		//CLS1_SendStr("SW1 released\n", CLS1_GetStdio()->stdOut);
@@ -213,7 +213,7 @@ void APP_Start(void) {
 	PL_Init();
 	APP_AdoptToHardware();
 	EVNT_SetEvent(EVNT_STARTUP);
-
+#if PL_LOCAL_CONFIG_BOARD_IS_REMOTE == 0
 	// Tasks
 	if (xTaskCreate(MainLoop, "main", 500 / sizeof(StackType_t), NULL,
 			tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
@@ -225,18 +225,19 @@ void APP_Start(void) {
 		for (;;) {
 		} //error case
 	}
+#endif
 	// Start Scheduler
 	vTaskStartScheduler();
 
 }
-
+#if PL_LOCAL_CONFIG_BOARD_IS_REMOTE == 0
 static void BlinkyTask(void) {
 	for (;;) {
 		LED2_Neg();
 		vTaskDelay(pdMS_TO_TICKS(500));
 	}
 }
-
+#endif
 static void MainLoop(void) {
 	for (;;) {
 		//This is the main programm loop in a task
@@ -247,7 +248,7 @@ static void MainLoop(void) {
 }
 
 
-
+#if PL_LOCAL_CONFIG_BOARD_IS_REMOTE == 0
 //ZORK zügs
 TaskHandle_t ZorkHandler;
 
@@ -282,3 +283,4 @@ void startZorkTask(void) {
 	vTaskResume(ZorkHandler);
 	vTaskSuspend(NULL);
 }
+#endif

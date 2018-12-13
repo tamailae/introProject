@@ -23,8 +23,10 @@
 
 #include "FRTOS1.h"
 
+#if PL_CONFIG_HAS_MOTOR_TACHO
 // Software Timer Handler
 xTimerHandle timerHndl_5mSec;
+#endif
 
 
 void TMR_OnInterrupt(void) {
@@ -38,12 +40,17 @@ if (cntr == (1000 / TMR_TICK_MS)) {
 }
 }
 
+#if PL_CONFIG_HAS_MOTOR_TACHO
 static void vTimerCallback5mSecExpired(xTimerHandle pxTimer) {
+
 	TACHO_Sample(); /* toggle red LED */
+
 }
+#endif
 
 void TMR_Init(void) {
-	//Create 5ms Timer
+#if PL_CONFIG_HAS_MOTOR_TACHO
+	//Create 5ms Timer for Tacho
 	timerHndl_5mSec = xTimerCreate("timer5m_Sec", /* name */
 	pdMS_TO_TICKS(5), /* period/time */
 	pdTRUE, /* auto reload */
@@ -56,9 +63,9 @@ void TMR_Init(void) {
 	if (xTimerStart(timerHndl_5mSec, 0)!=pdPASS) {
 	  for(;;); /* failure!?! */
 	}
+#endif
 
 }
-
 void TMR_Deinit(void) {
 }
 
