@@ -53,6 +53,7 @@
 #include "Reflectance.h"
 #endif
 #include "Sumo.h"
+#include "RStdIO.h"
 
 #if PL_CONFIG_HAS_EVENTS
 
@@ -100,6 +101,9 @@ void APP_EventHandler(EVNT_Handle event) {
 		//BUZ_PlayTune(BUZ_TUNE_BUTTON);
 		//CLS1_SendStr("SW1 short pressed\n", CLS1_GetStdio()->stdOut);
 		BtnMsg(1, "short pressed");
+		(void)RSTDIO_SendToTxStdio(RSTDIO_QUEUE_TX_IN,
+		"line start\r\n",
+		sizeof("line start\r\n")-1);
 #if PL_CONFIG_HAS_LINE_FOLLOW
 		if(!REF_IsReady()){
 			REF_CalibrateStartStop();
