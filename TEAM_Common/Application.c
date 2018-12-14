@@ -213,13 +213,14 @@ void APP_Start(void) {
 	PL_Init();
 	APP_AdoptToHardware();
 	EVNT_SetEvent(EVNT_STARTUP);
-#if PL_LOCAL_CONFIG_BOARD_IS_REMOTE == 0
+
 	// Tasks
 	if (xTaskCreate(MainLoop, "main", 500 / sizeof(StackType_t), NULL,
 			tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
 		for (;;) {
 		} //error case
 	}
+#if PL_LOCAL_CONFIG_BOARD_IS_REMOTE == 0
 	if (xTaskCreate(BlinkyTask, "blink", 500 / sizeof(StackType_t), NULL,
 			tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
 		for (;;) {
@@ -238,6 +239,7 @@ static void BlinkyTask(void) {
 	}
 }
 #endif
+
 static void MainLoop(void) {
 	for (;;) {
 		//This is the main programm loop in a task

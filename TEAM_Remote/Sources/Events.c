@@ -37,6 +37,7 @@ extern "C" {
 /* User includes (#include below this line is not maintained by Processor Expert) */
 #include "Timer.h"
 #include "Keys.h"
+#include "Trigger.h"
 
 /*
 ** ===================================================================
@@ -127,7 +128,7 @@ void SW4_OnInterrupt(void)
 */
 void SW3_OnInterrupt(void)
 {
-  /* Write your code here ... */
+	KEY_OnInterrupt(KEY_BTN3);
 }
 
 /*
@@ -161,7 +162,7 @@ void SW2_OnInterrupt(void)
 */
 void SW5_OnInterrupt(void)
 {
-  /* Write your code here ... */
+	KEY_OnInterrupt(KEY_BTN5);
 }
 
 /*
@@ -206,8 +207,7 @@ void FRTOS1_vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
 */
 void FRTOS1_vApplicationTickHook(void)
 {
-  /* Called for every RTOS tick. */
-  /* Write your code here ... */
+	TRG_AddTick();
 }
 
 /*
