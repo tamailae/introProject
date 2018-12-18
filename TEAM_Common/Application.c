@@ -87,7 +87,7 @@ void APP_EventHandler(EVNT_Handle event) {
 		CLS1_SendStr("Program Started", CLS1_GetStdio()->stdOut);
 		for (i = 0; i < 5; i++) {
 			LED1_Neg();
-			WAIT1_Waitms(500);
+			WAIT1_Waitms(100);
 		}
 		LED1_Off();
 	}
@@ -224,25 +224,11 @@ void APP_Start(void) {
 		for (;;) {
 		} //error case
 	}
-#if PL_LOCAL_CONFIG_BOARD_IS_REMOTE == 0
-	if (xTaskCreate(BlinkyTask, "blink", 500 / sizeof(StackType_t), NULL,
-			tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-		for (;;) {
-		} //error case
-	}
-#endif
+
 	// Start Scheduler
 	vTaskStartScheduler();
 
 }
-#if PL_LOCAL_CONFIG_BOARD_IS_REMOTE == 0
-static void BlinkyTask(void) {
-	for (;;) {
-		LED2_Neg();
-		vTaskDelay(pdMS_TO_TICKS(500));
-	}
-}
-#endif
 
 static void MainLoop(void) {
 	for (;;) {

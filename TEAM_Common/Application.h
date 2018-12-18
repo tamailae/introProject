@@ -20,7 +20,6 @@ void APP_EventHandler(EVNT_Handle event);
 void APP_Start(void);
 
 static void MainLoop(void);
-static void BlinkyTask(void);
 
 void initZork(void);
 void quitZorkTask(void);
