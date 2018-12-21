@@ -31,6 +31,9 @@
 #if 1 /*! \todo */
 #include "RNet_App.h"
 #endif
+#include "types.h"
+#include "IR6.h"
+#include "IR1.h"
 
 typedef enum {
 	STATE_IDLE, /* idle, not doing anything */
@@ -46,6 +49,7 @@ typedef enum {
 
 static volatile StateType LF_currState = STATE_IDLE;
 static xTaskHandle LFTaskHandle;
+boolean lastTurnLeft;
 
 void LF_StartFollowing(void) {
 	(void) xTaskNotify(LFTaskHandle, LF_START_FOLLOWING, eSetBits);
@@ -71,6 +75,13 @@ static void StateMachine(void);
  * \return Returns TRUE if still on line segment
  */
 static bool FollowSegment(void) {
+	if(getSensorRaw(0) > 0xF000){
+		lastTurnLeft = TRUE;
+	}
+	else if(getSensorRaw(5) > 0xF000){
+		lastTurnLeft = FALSE;
+	}
+
 	uint16_t currLine;
 	REF_LineKind currLineKind;
 
@@ -104,19 +115,29 @@ static void StateMachine(void) {
 	case STATE_TURN:
 		lineKind = REF_GetLineKind();
 		if (lineKind == REF_LINE_FULL) {
+
 			LF_currState = STATE_FINISHED;
 		}
 		if (lineKind == REF_LINE_NONE) {
-			TURN_Turn(TURN_LEFT180, NULL);
+			if(lastTurnLeft){
+				TURN_Turn(TURN_LEFT180, NULL);
+				TURN_Turn(TURN_STEP_LINE_FW, NULL);
+			}
+			else{
+				TURN_Turn(TURN_RIGHT180, NULL);
+				TURN_Turn(TURN_STEP_LINE_FW, NULL);
+			}
 			DRV_SetMode(DRV_MODE_NONE); /* disable position mode */
 			LF_currState = STATE_FOLLOW_SEGMENT;
 		}
 		if (lineKind == REF_LINE_RIGHT) {
+			TURN_Turn(TURN_STEP_LINE_FW, NULL);
 			TURN_Turn(TURN_RIGHT15, NULL);
 			DRV_SetMode(DRV_MODE_NONE); /* disable position mode */
 			LF_currState = STATE_FOLLOW_SEGMENT;
 		}
 		if (lineKind == REF_LINE_LEFT) {
+			TURN_Turn(TURN_STEP_LINE_FW, NULL);
 			TURN_Turn(TURN_LEFT15, NULL);
 			DRV_SetMode(DRV_MODE_NONE); /* disable position mode */
 			LF_currState = STATE_FOLLOW_SEGMENT;
@@ -128,6 +149,7 @@ static void StateMachine(void) {
 #endif
 	case STATE_FINISHED:
 		SHELL_SendString("Finished!\r\n");
+		BUZ_Beep(1000,2000);
 		LF_currState = STATE_STOP;
 		break;
 

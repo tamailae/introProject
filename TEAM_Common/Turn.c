@@ -30,19 +30,21 @@
 #if 0
 #define TURN_STEPS_90         400
 #else
-#define TURN_STEPS_90         700
+#define TURN_STEPS_90         500
 #endif
+#define TURN_STEPS_30         200
   /*!< number of steps for a 90 degree turn */
-#define TURN_STEPS_LINE       100
+#define TURN_STEPS_LINE       700
   /*!< number of steps stepping over the line */
-#define TURN_STEPS_POST_LINE  50
+#define TURN_STEPS_POST_LINE  500
   /*!< number of steps after the line, before making a turn */
 #define TURN_STEPS_90_TIMEOUT_MS        1000
-#define TURN_STEPS_LINE_TIMEOUT_MS      200
-#define TURN_STEPS_POST_LINE_TIMEOUT_MS 200
-#define TURN_STEPS_STOP_TIMEOUT_MS      150
+#define TURN_STEPS_LINE_TIMEOUT_MS      1000
+#define TURN_STEPS_POST_LINE_TIMEOUT_MS 1000
+#define TURN_STEPS_STOP_TIMEOUT_MS      1000
 
 static int32_t TURN_Steps90 = TURN_STEPS_90;
+static int32_t TURN_Steps30 = TURN_STEPS_30;
 static int32_t TURN_StepsLine = TURN_STEPS_LINE;
 static int32_t TURN_StepsPostLine = TURN_STEPS_POST_LINE;
 
@@ -101,7 +103,7 @@ void TURN_MoveToPos(int32_t targetLPos, int32_t targetRPos, bool wait, TURN_Stop
 
 static void StepsTurn(int32_t stepsL, int32_t stepsR, TURN_StopFct stopIt, int32_t timeOutMS) {
   int32_t currLPos, currRPos, targetLPos, targetRPos;
-  /*
+/*
   // stop before turn
   int timeout = TURN_STEPS_STOP_TIMEOUT_MS;
   
@@ -128,11 +130,12 @@ static void StepsTurn(int32_t stepsL, int32_t stepsR, TURN_StopFct stopIt, int32
 
 void TURN_Turn(TURN_Kind kind, TURN_StopFct stopIt) {
   switch(kind) {
+
   	  case TURN_LEFT15:
-        StepsTurn(-TURN_Steps90/3, TURN_Steps90/2, stopIt, TURN_STEPS_90_TIMEOUT_MS/6);
+        StepsTurn(-(TURN_Steps90/7), TURN_Steps90/7, stopIt, TURN_STEPS_90_TIMEOUT_MS);
         break;
       case TURN_RIGHT15:
-        StepsTurn(TURN_Steps90/2, -TURN_Steps90/3, stopIt, TURN_STEPS_90_TIMEOUT_MS/6);
+        StepsTurn(TURN_Steps90/7, -(TURN_Steps90/7), stopIt, TURN_STEPS_90_TIMEOUT_MS);
         break;
     case TURN_LEFT45:
       StepsTurn(-TURN_Steps90/2, TURN_Steps90/2, stopIt, TURN_STEPS_90_TIMEOUT_MS/2);
@@ -147,10 +150,10 @@ void TURN_Turn(TURN_Kind kind, TURN_StopFct stopIt) {
       StepsTurn(TURN_Steps90, -TURN_Steps90, stopIt, TURN_STEPS_90_TIMEOUT_MS);
       break;
     case TURN_LEFT180:
-      StepsTurn(-(2*TURN_Steps90), 2*TURN_Steps90, stopIt, TURN_STEPS_90_TIMEOUT_MS*2);
+      StepsTurn(-(5*TURN_Steps30), 5*TURN_Steps30, stopIt, TURN_STEPS_90_TIMEOUT_MS*2);
      break;
     case TURN_RIGHT180:
-      StepsTurn(2*TURN_Steps90, -(2*TURN_Steps90), stopIt, TURN_STEPS_90_TIMEOUT_MS*2);
+      StepsTurn(5*TURN_Steps30, -(5*TURN_Steps30), stopIt, TURN_STEPS_90_TIMEOUT_MS*2);
      break;
     case TURN_STEP_BORDER_BW:
       StepsTurn(-(3*TURN_StepsLine), -(3*TURN_StepsLine), stopIt, TURN_STEPS_LINE_TIMEOUT_MS);
@@ -165,7 +168,7 @@ void TURN_Turn(TURN_Kind kind, TURN_StopFct stopIt) {
       StepsTurn(TURN_StepsPostLine, TURN_StepsPostLine, stopIt, TURN_STEPS_POST_LINE_TIMEOUT_MS);
       break;
     case TURN_STEP_POST_LINE_BW:
-      StepsTurn(-TURN_StepsPostLine, -TURN_StepsPostLine, stopIt, TURN_STEPS_POST_LINE_TIMEOUT_MS);
+      StepsTurn(TURN_StepsPostLine/4, TURN_StepsPostLine/4, stopIt, TURN_STEPS_POST_LINE_TIMEOUT_MS);
       break;
     case TURN_STEP_LINE_FW_POST_LINE: /* combination of TURN_STEP_LINE_FW and TURN_STEP_POST_LINE_FW */
       StepsTurn(TURN_StepsLine+TURN_StepsPostLine, TURN_StepsLine+TURN_StepsPostLine, stopIt, TURN_STEPS_LINE_TIMEOUT_MS+TURN_STEPS_POST_LINE_TIMEOUT_MS);

@@ -114,6 +114,10 @@ static const SensorFctType SensorFctArray[REF_NOF_SENSORS] = {
   {S6_SetOutput, S6_SetInput, S6_SetVal, S6_GetVal},
 };
 
+uint16_t getSensorRaw (int sensor){
+	return SensorRaw[sensor];
+}
+
 #if 1 || PL_CONFIG_HAS_LINE_MAZE
 void REF_GetSensorValues(uint16_t *values, int nofValues) {
   int i;
